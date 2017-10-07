@@ -155,15 +155,17 @@ class Content extends React.Component {
         sending: true
       });
       const body = JSON.stringify({
-        sid: this.props.sid,
-        service: this.state.serviceId,
-        procsale: this.state.procsaleId,
-        rubsaleid: this.state.rubsaleId,
-        rubsalesval: this.state.rubsaleValue,
-        permsale: this.state.permsale,
-        num: this.state.lessonNum,
-        office: this.state.office,
-        remain: this.state.remain
+        Invoicestud: {
+          sid: this.props.sid,
+          service: this.state.serviceId,
+          procsale: this.state.procsaleId,
+          rubsaleid: this.state.rubsaleId,
+          rubsalesval: this.state.rubsaleValue,
+          permsale: this.state.permsale,
+          num: this.state.lessonNum,
+          office: this.state.office,
+          remain: this.state.remain
+        }
       });
       fetch('/invoice/create',
       {
