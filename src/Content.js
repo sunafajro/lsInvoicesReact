@@ -35,7 +35,7 @@ class Content extends React.Component {
     let procSaleVal = this.state.procsaleId !== '0' ? this.getProcSaleValue(this.state.procsaleId) : null;
     let rubSaleVal = this.state.rubsaleId !== '0' ? this.getRubSaleValue(this.state.rubsaleId) : null;
 
-    totalValue = (parseInt(this.state.lessonNum) * serviceVal).toFixed(2);
+    totalValue = (this.state.lessonNum * serviceVal).toFixed(2);
     totalWithSale = totalValue;
 
     if (rubSaleVal) {
@@ -50,18 +50,11 @@ class Content extends React.Component {
       totalWithSale = (totalWithSale - (totalWithSale * this.props.permsale.value * 0.01)).toFixed(2);
     }
 
-    let validation = { ...this.state.validation };
-    validation.service = null;
-    validation.num = null;
-    validation.office = null;
-
-    this.setState({
+    return {
       totalSum: totalValue,
       totalSumWithSale: totalWithSale,
-      totalSale: (totalValue - totalWithSale).toFixed(2),
-      saveResult: null,
-      validation
-    });
+      totalSale: (totalValue - totalWithSale).toFixed(2)
+    };
   }
 
   /**
@@ -149,11 +142,23 @@ class Content extends React.Component {
     return valid;
   }
 
+  /**
+   * отправляет данные формы на сервер
+   */
   handleSendForm = () => {
     if (this.validateForm()) {
+      const { totalSum, totalSumWithSale, totalSale } = this.calcInvoiceSum();
+      const validation = this.resetValidation();
+
       this.setState({
-        sending: true
+        sending: true,
+        totalSum,
+        totalSumWithSale,
+        totalSale,
+        validation, 
+        saveResult: null
       });
+
       const body = JSON.stringify({
         Invoicestud: {
           sid: this.props.sid,
@@ -161,10 +166,12 @@ class Content extends React.Component {
           procsale: this.state.procsaleId,
           rubsaleid: this.state.rubsaleId,
           rubsalesval: this.state.rubsaleValue,
-          permsale: this.state.permsale,
+          permsale: this.state.permsaleId,
           num: this.state.lessonNum,
-          office: this.state.office,
-          remain: this.state.remain
+          office: this.state.officeId,
+          remain: this.state.remain ? '1' : '0',
+          invoiceValue: totalSumWithSale,
+          invoiceDiscount: totalSale
         }
       });
       fetch('/invoice/create',
@@ -195,6 +202,36 @@ class Content extends React.Component {
         });
       });
     }
+  }
+
+  /**
+   * обрабатывает нажатие кнопки Рассчитать
+   */
+  handleButtonClick = () => {
+    const { totalSum, totalSumWithSale, totalSale } = this.calcInvoiceSum();
+    const validation = this.resetValidation();
+
+    this.setState({
+      totalSum,
+      totalSumWithSale,
+      totalSale,
+      validation, 
+      saveResult: null
+    });
+  }
+
+  /**
+   * сбрасывает состояние валидации
+   * @return {object}
+   */
+  resetValidation = () => {
+    let validation = { ...this.state.validation };
+    
+    validation.service = null;
+    validation.num = null;
+    validation.office = null;
+
+    return validation;
   }
 
   render () {
@@ -303,7 +340,7 @@ class Content extends React.Component {
                     name="Invoicestud[calc_salestud_value]"
                     value={ this.state.rubsaleValue }
                     onChange={(e) => this.setState({
-                      rubsaleValue: parseFloat(e.target.value).toFixed(2),
+                      rubsaleValue: parseFloat(e.target.value) >=0 ? parseFloat(e.target.value).toFixed(2) : '0.00',
                       rubsaleId: '0'
                     })}
                     disabled={ this.state.rubsaleId !== '0' ? true : false }
@@ -321,7 +358,7 @@ class Content extends React.Component {
               className="form-control"
               name="Invoicestud[num]"
               value={ this.state.lessonNum }
-              onChange={ (e) => this.setState({ lessonNum: e.target.value }) }
+              onChange={ (e) => this.setState({ lessonNum: parseInt(e.target.value) >= 0 ? parseInt(e.target.value) : '0' }) }
             />
           </div>
           { this.props.offices.length ?
@@ -347,7 +384,7 @@ class Content extends React.Component {
             <button
               style={{ marginRight: '5px'}}
               className="btn btn-primary"
-              onClick={ () => this.calcInvoiceSum() }
+              onClick={ () => this.handleButtonClick() }
             >{ this.props.labels.calculate }</button>
             <button
               style={{ marginRight: '5px'}}
