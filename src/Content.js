@@ -7,13 +7,13 @@ class Content extends React.Component {
     procsaleId: '0',
     permsaleId: '0',
     rubsaleId: '0',
-    rubsaleValue: "0.00",
+    rubsaleValue: 0,
     officeId: '0',
     lessonNum: 0,
     remain: false,
-    totalSum: "0.00",
-    totalSumWithSale: "0.00",
-    totalSale: "0.00",
+    totalSum: 0,
+    totalSumWithSale: 0,
+    totalSale: 0,
     validation: {
       service: null,
       num: null,
@@ -31,29 +31,38 @@ class Content extends React.Component {
   calcInvoiceSum = () => {
     let totalValue = 0;
     let totalWithSale = 0;
+    let totalSale = 0;
     let serviceVal = this.state.serviceId !== '0' ? this.getServiceValue(this.state.serviceId) : null;
     let procSaleVal = this.state.procsaleId !== '0' ? this.getProcSaleValue(this.state.procsaleId) : null;
     let rubSaleVal = this.state.rubsaleId !== '0' ? this.getRubSaleValue(this.state.rubsaleId) : null;
 
-    totalValue = (this.state.lessonNum * serviceVal).toFixed(2);
+    /* считаем полную стоимость без скидок */
+    totalValue = this.state.lessonNum * serviceVal;
     totalWithSale = totalValue;
-
+    
     if (rubSaleVal) {
-      totalWithSale = (totalWithSale - rubSaleVal).toFixed(2);
+      /* вычитаем рублевую назначенную скидку */
+      totalWithSale = totalWithSale - rubSaleVal;
     } else if (this.state.rubsaleValue) {
-      totalWithSale = (totalWithSale - this.state.rubsaleValue).toFixed(2);
+      /* или вычитаем рублевую введеную скидку */
+      totalWithSale = totalWithSale - this.state.rubsaleValue;
     }
 
     if (procSaleVal) {
-      totalWithSale = (totalWithSale - (totalWithSale * procSaleVal * 0.01)).toFixed(2);
+      /* вычитаем процентную назначенную скидку */
+      totalWithSale = totalWithSale - (totalWithSale * procSaleVal * 0.01);
     } else if (this.state.permsaleId !== '0') {
-      totalWithSale = (totalWithSale - (totalWithSale * this.props.permsale.value * 0.01)).toFixed(2);
+      /* вычитаем процентную постоянную скидку */
+      totalWithSale = totalWithSale - (totalWithSale * this.props.permsale.value * 0.01);
     }
+
+    /* олучаем размер скидки и округляем в большую сторону */
+    totalSale = Math.round(totalValue - totalWithSale);
 
     return {
       totalSum: totalValue,
-      totalSumWithSale: totalWithSale,
-      totalSale: (totalValue - totalWithSale).toFixed(2)
+      totalSumWithSale: totalValue - totalSale,
+      totalSale: totalSale
     };
   }
 
@@ -262,7 +271,7 @@ class Content extends React.Component {
                 onChange={ (e) => this.setState({ serviceId: e.target.value }) }
               ><option value='0'>{ this.props.labels.select}</option>
                 { this.props.services.map(item => {
-                    return (<option key={'service_' + item.id} value={ item.id }>{ item.name } ({ item.value } р.)</option>);
+                    return (<option key={'service_' + item.id} value={ item.id }>#{ item.id } { item.name } ({ item.value } р.)</option>);
                 }) }          
               </select>
             </div> : '' }
@@ -321,9 +330,9 @@ class Content extends React.Component {
                     value={ this.state.rubsaleId }
                     onChange={(e) => this.setState({
                       rubsaleId: e.target.value,
-                      rubsaleValue: "0.00"
+                      rubsaleValue: 0
                     })}
-                    disabled={ this.state.rubsaleValue !== "0.00" ? true : false }
+                    disabled={ this.state.rubsaleValue !== 0 ? true : false }
                   ><option value='0'>{ this.props.labels.select }</option>
                     { this.props.rubsales.map(item => {
                       return (<option key={'rubsale_' + item.id} value={ item.id }>{ item.name }</option>);
@@ -340,7 +349,7 @@ class Content extends React.Component {
                     name="Invoicestud[calc_salestud_value]"
                     value={ this.state.rubsaleValue }
                     onChange={(e) => this.setState({
-                      rubsaleValue: parseFloat(e.target.value) >=0 ? parseFloat(e.target.value).toFixed(2) : '0.00',
+                      rubsaleValue: parseInt(e.target.value) >= 0 ? parseInt(e.target.value) : 0,
                       rubsaleId: '0'
                     })}
                     disabled={ this.state.rubsaleId !== '0' ? true : false }
@@ -358,7 +367,7 @@ class Content extends React.Component {
               className="form-control"
               name="Invoicestud[num]"
               value={ this.state.lessonNum }
-              onChange={ (e) => this.setState({ lessonNum: parseInt(e.target.value) >= 0 ? parseInt(e.target.value) : '0' }) }
+              onChange={ (e) => this.setState({ lessonNum: parseInt(e.target.value) >= 0 ? parseInt(e.target.value) : 0 }) }
             />
           </div>
           { this.props.offices.length ?
