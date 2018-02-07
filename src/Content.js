@@ -56,8 +56,9 @@ class Content extends React.Component {
       totalWithSale = totalWithSale - (totalWithSale * this.props.permsale.value * 0.01);
     }
 
+    console.log(totalValue, totalWithSale, (totalValue - totalWithSale));
     /* олучаем размер скидки и округляем в большую сторону */
-    if (totalValue === totalWithSale) {
+    if (totalWithSale === 0) {
       totalSale = totalValue - totalWithSale;
     } else {
       totalSale = Math.round(totalValue - totalWithSale);
