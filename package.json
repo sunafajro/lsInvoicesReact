@@ -8,12 +8,16 @@
     "build": "webpack",
     "production": "webpack --optimize-minimize --progress -p"
   },
-  "author": "Evgeny Belkin",
+  "author": "Evgeny Belkin <sunafajro@gmail.com>",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sunafajro/lsInvoicesReact"
+  },
   "dependencies": {
     "prop-types": "^15.5.10",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -22,7 +26,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "css-loader": "^0.28.4",
-    "style-loader": "^0.18.2",
+    "style-loader": "^0.20.1",
     "webpack": "^3.6.0"
   }
 }

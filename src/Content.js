@@ -57,7 +57,11 @@ class Content extends React.Component {
     }
 
     /* олучаем размер скидки и округляем в большую сторону */
-    totalSale = Math.round(totalValue - totalWithSale);
+    if (totalValue === totalWithSale) {
+      totalSale = totalValue - totalWithSale;
+    } else {
+      totalSale = Math.round(totalValue - totalWithSale);
+    }
 
     return {
       totalSum: totalValue,
