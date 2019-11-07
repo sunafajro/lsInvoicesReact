@@ -56,8 +56,7 @@ class Content extends React.Component {
       totalWithSale = totalWithSale - (totalWithSale * this.props.permsale.value * 0.01);
     }
 
-    console.log(totalValue, totalWithSale, (totalValue - totalWithSale));
-    /* олучаем размер скидки и округляем в большую сторону */
+    /* получаем размер скидки и округляем в большую сторону */
     if (totalWithSale === 0) {
       totalSale = totalValue - totalWithSale;
     } else {
@@ -257,7 +256,7 @@ class Content extends React.Component {
         { this.state.sending ? 
             <div className="alert alert-warning">{ this.props.labels.sendingMessage }</div> :
               this.state.saveResult === null ?
-                <div className="alert alert-info">{ this.props.labels.total }: { this.state.totalSum } р. - { this.state.totalSale } р. = { this.state.totalSumWithSale} р.</div> :
+                <div className="alert alert-info">{ this.props.labels.total }: { this.state.totalSum } р. { this.state.totalSale < 0 ? '+' : '-' } { Math.abs(this.state.totalSale) } р. = { this.state.totalSumWithSale} р.</div> :
                   this.state.saveResult !== true ?
                     <div className="alert alert-danger">{ this.props.labels.saveErrorMessage }</div> :
                       <div className="alert alert-success">{ this.props.labels.saveSuccessMessage }</div> }
@@ -354,7 +353,7 @@ class Content extends React.Component {
                     name="Invoicestud[calc_salestud_value]"
                     value={ this.state.rubsaleValue }
                     onChange={(e) => this.setState({
-                      rubsaleValue: parseInt(e.target.value) >= 0 ? parseInt(e.target.value) : 0,
+                      rubsaleValue: !isNaN(parseFloat(e.target.value)) ? parseFloat(e.target.value) : 0,
                       rubsaleId: '0'
                     })}
                     disabled={ this.state.rubsaleId !== '0' ? true : false }
