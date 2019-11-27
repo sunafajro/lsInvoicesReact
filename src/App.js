@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { Component } from 'react';
 import SideBar from './SideBar';
 import Content from './Content';
 
-class App extends React.Component {
+const SID = document.getElementById('app-invoice').dataset.sid;
+
+class App extends Component {
   state = {
     /* временное решение для получения id студента */
-    sid: window.location.search.substr(5),
+    sid: SID,
     userData: {},
     hints: [],
     services: [],

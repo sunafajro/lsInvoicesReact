@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import UserBlock from './UserBlock';
 
-class SideBar extends React.Component {
+class SideBar extends Component {
   render () {
   	return (
       <div id="sidebar" className="col-xs-6 col-sm-2 sidebar-offcanvas">

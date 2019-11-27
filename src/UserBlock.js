@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-class UserBlock extends React.Component {
+class UserBlock extends Component {
 
   render() {
     return (

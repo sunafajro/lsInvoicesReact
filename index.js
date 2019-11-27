@@ -4,5 +4,5 @@ import App from './src/App';
 
 ReactDOM.render(
   <App />,
-  document.getElementById('react-invoices-root')
+  document.getElementById('app-invoice')
 );
