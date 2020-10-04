@@ -15,9 +15,9 @@
     "url": "git+https://github.com/sunafajro/lsInvoicesReact"
   },
   "dependencies": {
-    "prop-types": "^15.5.10",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0"
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

@@ -28,7 +28,7 @@ class App extends Component {
   getData = (sid) => {
     this.setState({ fetchingData: true });
     const body = JSON.stringify({sid: sid});
-    fetch('/invoice/get-data', 
+    fetch('/school/invoice/get-data', 
     {
       method: 'POST',
       accept: 'application/json',
