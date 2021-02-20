@@ -209,7 +209,7 @@ class Content extends Component {
           salePurpose: this.state.salePurpose
         }
       });
-      fetch("/school/invoice/create", {
+      fetch("/invoice/create", {
         method: "POST",
         accept: "application/json",
         credentials: "include",
@@ -225,7 +225,7 @@ class Content extends Component {
               saveResult: true
             });
             let timer = setTimeout(() => {
-              window.location.replace("/school/studname/view?id=" + this.props.sid);
+              window.location.replace("/studname/view?id=" + this.props.sid);
             }, 2000);
           } else {
             throw new Error("error");

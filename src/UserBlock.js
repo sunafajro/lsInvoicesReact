@@ -10,7 +10,7 @@ class UserBlock extends Component {
           {
           	this.props.user.teacherId ?
               <a
-                href={ '/school/teacher/view?id=' + this.props.user.teacherId }
+                href={ '/teacher/view?id=' + this.props.user.teacherId }
                 className="fa fa-user btn btn-default btn-xs"
                 style={{ marginLeft: '2px'}}
               ></a>
