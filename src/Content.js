@@ -26,7 +26,7 @@ class Content extends Component {
   };
 
   /**
-   * считает полную стоимость счета и скидку
+   * считает полную стоимость счета и скидку,
    * а так же сбрасывает состояние валидации полей
    * и состояние результата запроса создания счета
    */
@@ -36,55 +36,55 @@ class Content extends Component {
     let totalSale = 0;
     let serviceVal =
       this.state.serviceId !== "0"
-        ? this.getServiceValue(this.state.serviceId)
+        ? this.getServiceValue(this.state.serviceId) * 100
         : null;
     let procSaleVal =
-      this.state.procsaleId !== "0"
+      this.state.procsaleId !== "0" && this.state.procsaleId !== ""
         ? this.getProcSaleValue(this.state.procsaleId)
         : null;
     let rubSaleVal =
-      this.state.rubsaleId !== "0"
-        ? this.getRubSaleValue(this.state.rubsaleId)
+      this.state.rubsaleId !== "0" && this.state.rubsaleId !== ""
+        ? this.getRubSaleValue(this.state.rubsaleId) * 100
         : null;
 
-    /* считаем полную стоимость без скидок */
-    totalValue = this.state.lessonNum * serviceVal;
-    totalWithSale = totalValue;
-
+    let serviceValWithSale = serviceVal;
     if (rubSaleVal) {
       /* вычитаем рублевую назначенную скидку */
-      totalWithSale = totalWithSale - rubSaleVal;
+      serviceValWithSale = serviceVal - rubSaleVal;
     } else if (this.state.rubsaleValue) {
-      /* или вычитаем рублевую введеную скидку */
-      totalWithSale = totalWithSale - this.state.rubsaleValue;
+      /* или вычитаем рублевую введенную скидку */
+      serviceValWithSale = serviceVal - parseFloat(this.state.rubsaleValue) * 100;
     }
+
+    /* считаем полную стоимость (за вычетом рублевой скидки) */
+    totalValue = this.state.lessonNum * serviceValWithSale;
+    totalWithSale = totalValue;
 
     if (procSaleVal) {
       /* вычитаем процентную назначенную скидку */
       totalWithSale = totalWithSale - totalWithSale * procSaleVal * 0.01;
     } else if (this.state.permsaleId !== "0") {
       /* вычитаем процентную постоянную скидку */
-      totalWithSale =
-        totalWithSale - totalWithSale * this.props.permsale.value * 0.01;
+      totalWithSale = totalWithSale - totalWithSale * this.props.permsale.value * 0.01;
     }
 
     /* получаем размер скидки и округляем в большую сторону */
     if (totalWithSale === 0) {
-      totalSale = totalValue - totalWithSale;
+      totalSale = totalValue;
     } else {
-      totalSale = Math.round(totalValue - totalWithSale);
+      totalSale = totalValue - totalWithSale;
     }
 
     return {
-      totalSum: totalValue,
-      totalSumWithSale: totalValue - totalSale,
-      totalSale: totalSale
+      totalSum: Math.round(totalValue / 100),
+      totalSumWithSale: Math.round((totalValue - totalSale)  / 100),
+      totalSale: Math.round(totalSale / 100),
     };
   };
 
   /**
    * возвращает стоимость услуги по идентификатору
-   * @param {sting} id
+   * @param {string} id
    * @return {number}
    */
   getServiceValue = id => {
@@ -141,14 +141,14 @@ class Content extends Component {
     let valid = true;
     let validation = { ...this.state.validation };
 
-    if (this.state.serviceId === "0") {
+    if (this.state.serviceId === "0" && this.state.serviceId === "") {
       valid = false;
       validation.service = false;
     } else {
       validation.service = true;
     }
 
-    if (this.state.rubsaleValue !== 0) {
+    if (this.state.rubsaleValue !== 0 && this.state.rubsaleValue !== '') {
       if (!this.state.salePurpose) {
         valid = false;
         validation.purpose = false;
@@ -245,6 +245,7 @@ class Content extends Component {
    */
   handleButtonClick = () => {
     const { totalSum, totalSumWithSale, totalSale } = this.calcInvoiceSum();
+    console.debug(totalSum, totalSumWithSale, totalSale);
     const validation = this.resetValidation();
 
     this.setState({
@@ -356,7 +357,7 @@ class Content extends Component {
                         permsaleId: "0"
                       })
                     }
-                    disabled={this.state.permsaleId !== "0" ? true : false}
+                    disabled={this.state.permsaleId !== "0" && this.state.permsaleId !== ""}
                   >
                     <option value="0">{labels.select}</option>
                     {procsales.map(item => {
@@ -392,7 +393,7 @@ class Content extends Component {
                         procsaleId: "0"
                       })
                     }
-                    disabled={this.state.procsaleId !== "0" ? true : false}
+                    disabled={this.state.procsaleId !== "0" && this.state.procsaleId !== ""}
                   >
                     <option value="0">{labels.select}</option>
                     <option value={permsale.id}>{permsale.name}</option>
@@ -425,7 +426,7 @@ class Content extends Component {
                         salePurpose: '',
                       })
                     }
-                    disabled={this.state.rubsaleValue !== 0 ? true : false}
+                    disabled={this.state.rubsaleValue !== 0 && this.state.rubsaleValue !== ''}
                   >
                     <option value="0">{labels.select}</option>
                     {rubsales.map(item => {
@@ -452,20 +453,20 @@ class Content extends Component {
                   className="form-control"
                   name="Invoicestud[calc_salestud_value]"
                   value={this.state.rubsaleValue}
-                  onChange={e =>
+                  onChange={e => {
                     this.setState({
                       rubsaleValue: !isNaN(parseFloat(e.target.value))
-                        ? parseFloat(e.target.value)
+                        ? e.target.value
                         : 0,
                       rubsaleId: "0"
-                    })
-                  }
-                  disabled={this.state.rubsaleId !== "0" ? true : false}
+                    });
+                  }}
+                  disabled={this.state.rubsaleId !== "0" && this.state.rubsaleId !== ""}
                 />
               </div>
             </div>
           </div>
-          {this.state.rubsaleValue !== 0 ? (
+          {this.state.rubsaleValue !== 0 && this.state.rubsaleValue !== '' ? (
             <div className="row">
               <div className="col-sm-12">
                 <div
